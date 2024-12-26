@@ -3,7 +3,10 @@
       <h1>Gallery</h1>
       <div v-if="images.length === 0">No images available</div>
       <div v-else class="gallery">
-        <img v-for="image in images" :key="image.name" :src="image.url" :alt="image.name" />
+        <div v-for="image in images" :key="image.name">
+          <img :src="image.url" :alt="image.name" />
+          <p>Uploaded At: {{ image.uploadedAt }}</p>
+        </div>
       </div>
     </div>
   </template>
@@ -14,7 +17,7 @@
   const images = ref([]);
   
   onMounted(async () => {
-    const res = await fetch("/api/images");
+    const res = await fetch("/.netlify/functions/list");
     images.value = await res.json();
   });
   </script>

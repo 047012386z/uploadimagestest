@@ -1,17 +1,17 @@
-import formidable from "formidable";
-import fs from "fs";
-import { defineEventHandler, readBody } from "h3";
+import { getStore } from "@netlify/blobs";
 
-export default defineEventHandler(async (event) => {
-  const form = formidable({ uploadDir: "./public/images", keepExtensions: true });
+export default async (req: Request) => {
+  const imagesStore = getStore("images");
 
-  return new Promise((resolve, reject) => {
-    form.parse(event.node.req, (err, fields, files) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve({ message: "File uploaded successfully", fields, files });
-    });
+  // อ่านข้อมูลไฟล์จาก Request Body
+  const { name, url } = await req.json();
+
+  // เก็บข้อมูลไฟล์ (URL และ Metadata)
+  await imagesStore.set(name, url, {
+    metadata: {
+      uploadedAt: new Date().toISOString(),
+    },
   });
-});
+
+  return new Response("Image uploaded successfully");
+};

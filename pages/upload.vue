@@ -2,7 +2,8 @@
     <div>
       <h1>Upload Image</h1>
       <form @submit.prevent="uploadImage">
-        <input type="file" ref="fileInput" />
+        <input v-model="name" placeholder="File name" />
+        <input v-model="url" placeholder="File URL" />
         <button type="submit">Upload</button>
       </form>
       <p v-if="message">{{ message }}</p>
@@ -12,19 +13,18 @@
   <script setup>
   import { ref } from "vue";
   
-  const fileInput = ref(null);
+  const name = ref("");
+  const url = ref("");
   const message = ref("");
   
   const uploadImage = async () => {
-    const formData = new FormData();
-    formData.append("file", fileInput.value.files[0]);
-  
-    const res = await fetch("/api/upload", {
+    const res = await fetch("/.netlify/functions/upload", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify({ name: name.value, url: url.value }),
+      headers: { "Content-Type": "application/json" },
     });
-    const data = await res.json();
-    message.value = data.message;
+    const data = await res.text();
+    message.value = data;
   };
   </script>
   
